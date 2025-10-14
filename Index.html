@@ -400,13 +400,13 @@ document.addEventListener('DOMContentLoaded', function () {
     await renderGrid();
   };
   jugarAzarBtn.onclick = async () => {
-    const opcion = confirm("¿Jugar con 2 números?\nAceptar = 2 números\nCancelar = elegir entre 3 y 5");
+    const opcion = confirm("¿Jugar con 2 números?\nAceptar = 2 números\nCancelar = elegir entre 3 y 10");
     if (opcion) {
       await playRandom(2);
     } else {
-      let cantidad = prompt("¿Cuántos números? (3 a 5)", "3");
+      let cantidad = prompt("¿Cuántos números? (3 a 10)", "5");
       cantidad = parseInt(cantidad);
-      if (isNaN(cantidad) || cantidad < 3 || cantidad > 5) cantidad = 3;
+      if (isNaN(cantidad) || cantidad < 3 || cantidad > 10) cantidad = 4;
       await playRandom(cantidad);
     }
   };

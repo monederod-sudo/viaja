@@ -187,7 +187,7 @@
 <script>
 // === CONFIGURACIÓN ===
 // URL base de tu backend (ajusta si usas otro puerto o dominio)
-const API_BASE = 'https://juegaygana.onrender.com';
+const API_BASE = 'https://viaja-1.onrender.com';
 
 // === OBTENER PARTICIPACIONES DESDE SUPABASE (solo lectura) ===
 async function obtenerParticipacionesDesdeSupabase() {
@@ -229,7 +229,7 @@ async function validarParticipacion(id) {
 
     if (response.ok) {
       alert(`✅ ${data.message}`);
-      const participaciones = await obtenerparticipantesDesdeSupabase();
+      const participaciones = await obtenerParticipacionesDesdeSupabase();
       renderizarTabla(participantes);
     } else {
       alert(`❌ Error: ${data.error}`);
@@ -253,7 +253,7 @@ async function rechazarParticipacion(id) {
 
     if (response.ok) {
       alert(`✅ ${data.message}`);
-      const participaciones = await obtenerparticipantesDesdeSupabase();
+      const participaciones = await obtenerParticipacionesDesdeSupabase();
       renderizarTabla(participantes);
     } else {
       alert(`❌ Error: ${data.error}`);
@@ -350,7 +350,7 @@ document.getElementById('ganadorPopup').addEventListener('click', function(e) {
 
 // === INICIALIZAR ===
 window.addEventListener('load', async () => {
-  const participaciones = await obtenerparticipantesDesdeSupabase();
+  const participaciones = await obtenerParticipacionesDesdeSupabase();
   renderizarTabla(participantes);
 });
 </script>
