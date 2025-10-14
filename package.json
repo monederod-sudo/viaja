@@ -2,9 +2,9 @@
   "name": "gana-y-viaja-backend",
   "version": "1.0.0",
   "description": "Backend para el sorteo Gana y Viaja",
-  "main": "server.js",
+  "main": "server1.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server1.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {
