@@ -195,7 +195,7 @@ async function obtenerParticipacionesDesdeSupabase() {
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNicHNpYWVldXZiemV6c3Zkd3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MzY1NDEsImV4cCI6MjA3NjAxMjU0MX0.2WK4eDppQPe5KdcQgSS9oQRpvUH_9C_UzU8jJIEgnow';
   
   try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/participaciones?select=*`, {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/participantes?select=*`, {
       headers: {
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -229,8 +229,8 @@ async function validarParticipacion(id) {
 
     if (response.ok) {
       alert(`✅ ${data.message}`);
-      const participaciones = await obtenerParticipacionesDesdeSupabase();
-      renderizarTabla(participaciones);
+      const participaciones = await obtenerparticipantesDesdeSupabase();
+      renderizarTabla(participantes);
     } else {
       alert(`❌ Error: ${data.error}`);
     }
@@ -253,8 +253,8 @@ async function rechazarParticipacion(id) {
 
     if (response.ok) {
       alert(`✅ ${data.message}`);
-      const participaciones = await obtenerParticipacionesDesdeSupabase();
-      renderizarTabla(participaciones);
+      const participaciones = await obtenerparticipantesDesdeSupabase();
+      renderizarTabla(participantes);
     } else {
       alert(`❌ Error: ${data.error}`);
     }
@@ -265,8 +265,8 @@ async function rechazarParticipacion(id) {
 }
 
 // === RENDERIZAR TABLA ===
-function renderizarTabla(participaciones) {
-  const tbody = document.querySelector('#participacionesTable tbody');
+function renderizarTabla(participantes) {
+  const tbody = document.querySelector('#participantesTable tbody');
   tbody.innerHTML = '';
 
   if (participaciones.length === 0) {
@@ -301,7 +301,7 @@ function renderizarTabla(participaciones) {
 // === BÚSQUEDA Y GANADOR ===
 async function buscarParticipacion() {
   const term = document.getElementById('searchInput').value.toLowerCase();
-  const todas = await obtenerParticipacionesDesdeSupabase();
+  const todas = await obtenerparticipantesDesdeSupabase();
   const filtradas = todas.filter(p =>
     (p.nombre?.toLowerCase().includes(term)) ||
     (p.telefono?.includes(term)) ||
@@ -312,7 +312,7 @@ async function buscarParticipacion() {
 }
 
 async function encontrarGanador() {
-  const todas = await obtenerParticipacionesDesdeSupabase();
+  const todas = await obtenerparticipantesDesdeSupabase();
   const confirmadas = todas.filter(p => p.estado === 'confirmado');
   if (confirmadas.length === 0) {
     alert('No hay participaciones confirmadas.');
@@ -350,8 +350,8 @@ document.getElementById('ganadorPopup').addEventListener('click', function(e) {
 
 // === INICIALIZAR ===
 window.addEventListener('load', async () => {
-  const participaciones = await obtenerParticipacionesDesdeSupabase();
-  renderizarTabla(participaciones);
+  const participaciones = await obtenerparticipantesDesdeSupabase();
+  renderizarTabla(participantes);
 });
 </script>
 
