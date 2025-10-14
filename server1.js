@@ -10,9 +10,30 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 // === CONFIGURACIÃ“N DE SUPABASE ===
-const supabaseUrl = 'https://zwttelekesidzebzemhi.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3dHRlbGVrZXNpZHplYnplbWhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMDgwNzUsImV4cCI6MjA3NTU4NDA3NX0.wPgPxellU5IorwrsgOjAHyMGVpg5wGnapCfLDHc7hZM';
+const supabaseUrl = 'https://sbpsiaeeuvbzezsvdwst.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNicHNpYWVldXZiemV6c3Zkd3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MzY1NDEsImV4cCI6MjA3NjAxMjU0MX0.2WK4eDppQPe5KdcQgSS9oQRpvUH_9C_UzU8jJIEgnow';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+
+
+// === Diagnóstico: prueba la conexión ===
+(async () => {
+  try {
+    const { data, error } = await supabase
+      .from('participaciones')
+      .select('id')
+      .limit(1);
+    
+    if (error) {
+      console.error('?? Error al acceder a la tabla "participaciones":', error);
+    } else {
+      console.log('? Conexión a Supabase y tabla "participaciones" OK. Ejemplo de dato:', data);
+    }
+  } catch (err) {
+    console.error('?? Error inesperado al probar Supabase:', err);
+  }
+})();
+
 
 // === CONFIGURACIÃ“N DE CORREO (Gmail) ===
 const transporter = nodemailer.createTransport({
@@ -209,8 +230,3 @@ app.post('/api/participacion/:id/rechazar', async (req, res) => {
   }
 });
 
-// === INICIAR SERVIDOR ===
-app.listen(PORT, () => {
-  console.log(`ðŸš€ Backend corriendo en http://localhost:${PORT}`);
-  console.log(`ðŸ“¡ Supabase URL: ${supabaseUrl}`);
-});
