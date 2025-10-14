@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const TOTAL_NUMBERS = 10000;
   const PRICE_PER_NUMBER = 100;
   const MIN_SELECTION = 2;
-  const API_URL = 'https://viaja-1.onrender.com';
+  const API_URL = 'https://juegaygana.onrender.com';
 
   // === VALIDACIÓN DE REFERENCIA ===
   function esReferenciaSospechosa(ref) {
@@ -281,66 +281,61 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // === SELECCIÓN DE NÚMEROS ===
   async function renderGrid() {
-  const ocupados = await obtenerNumerosOcupados();
-  listaNumerosDiv.innerHTML = '';
-
-  if (selectedNumbers.length > 0) {
-    const selectedContainer = document.createElement('div');
-    selectedContainer.style.textAlign = 'center';
-    selectedContainer.innerHTML = `<p><strong>Números seleccionados:</strong></p>`;
-    const numsDiv = document.createElement('div');
-    numsDiv.style.display = 'flex'; 
-    numsDiv.style.flexWrap = 'wrap'; 
-    numsDiv.style.justifyContent = 'center'; 
-    numsDiv.style.gap = '8px';
-    selectedNumbers.forEach(num => {
-      const span = document.createElement('span');
-      span.textContent = num;
-      span.style.padding = '6px 10px'; 
-      span.style.backgroundColor = '#1976d2'; 
-      span.style.color = 'white';
-      span.style.borderRadius = '4px'; 
-      span.style.fontWeight = 'bold'; 
-      span.style.cursor = 'pointer';
-      span.onclick = () => toggleSelect(num);
-      numsDiv.appendChild(span);
-    });
-    selectedContainer.appendChild(numsDiv);
-    listaNumerosDiv.appendChild(selectedContainer);
-  }
-
-  const gridTitle = document.createElement('h3');
-  gridTitle.textContent = 'Elige más números';
-  listaNumerosDiv.appendChild(gridTitle);
-
-  const gridContainer = document.createElement('div');
-  gridContainer.style.height = '200px'; 
-  gridContainer.style.overflowY = 'auto'; 
-  gridContainer.style.border = '1px solid #ccc';
-  gridContainer.style.borderRadius = '4px'; 
-  gridContainer.style.padding = '10px'; 
-  gridContainer.style.marginTop = '10px';
-
-  const grid = document.createElement('div');
-  grid.className = 'grid-numeros';
-
-  for (let i = 0; i < TOTAL_NUMBERS; i++) {
-    const num = String(i).padStart(4, '0');
-    if (!ocupados.has(num)) { // 👈 Solo si NO está ocupado
-      const cell = document.createElement('div');
-      cell.className = 'numero-celda';
-      cell.textContent = num;
-      if (selectedNumbers.includes(num)) {
-        cell.classList.add('seleccionado');
-      }
-      cell.addEventListener('click', () => toggleSelect(num));
-      grid.appendChild(cell);
+    const ocupados = await obtenerNumerosOcupados();
+    listaNumerosDiv.innerHTML = '';
+    if (selectedNumbers.length > 0) {
+      const selectedContainer = document.createElement('div');
+      selectedContainer.style.textAlign = 'center';
+      selectedContainer.innerHTML = `<p><strong>Números seleccionados:</strong></p>`;
+      const numsDiv = document.createElement('div');
+      numsDiv.style.display = 'flex';
+      numsDiv.style.flexWrap = 'wrap';
+      numsDiv.style.justifyContent = 'center';
+      numsDiv.style.gap = '8px';
+      selectedNumbers.forEach(num => {
+        const span = document.createElement('span');
+        span.textContent = num;
+        span.style.padding = '6px 10px';
+        span.style.backgroundColor = '#1976d2';
+        span.style.color = 'white';
+        span.style.borderRadius = '4px';
+        span.style.fontWeight = 'bold';
+        span.style.cursor = 'pointer';
+        span.onclick = () => toggleSelect(num);
+        numsDiv.appendChild(span);
+      });
+      selectedContainer.appendChild(numsDiv);
+      listaNumerosDiv.appendChild(selectedContainer);
     }
+    const gridTitle = document.createElement('h3');
+    gridTitle.textContent = 'Elige más números';
+    listaNumerosDiv.appendChild(gridTitle);
+    const gridContainer = document.createElement('div');
+    gridContainer.style.height = '200px';
+    gridContainer.style.overflowY = 'auto';
+    gridContainer.style.border = '1px solid #ccc';
+    gridContainer.style.borderRadius = '4px';
+    gridContainer.style.padding = '10px';
+    gridContainer.style.marginTop = '10px';
+    const grid = document.createElement('div');
+    grid.className = 'grid-numeros';
+    for (let i = 0; i < TOTAL_NUMBERS; i++) {
+      const num = String(i).padStart(4, '0');
+      if (!ocupados.has(num)) {
+        const cell = document.createElement('div');
+        cell.className = 'numero-celda';
+        cell.textContent = num;
+        cell.setAttribute('data-num', num);
+        if (selectedNumbers.includes(num)) {
+          cell.classList.add('seleccionado');
+        }
+        cell.addEventListener('click', () => toggleSelect(num));
+        grid.appendChild(cell);
+      }
+    }
+    gridContainer.appendChild(grid);
+    listaNumerosDiv.appendChild(gridContainer);
   }
-
-  gridContainer.appendChild(grid);
-  listaNumerosDiv.appendChild(gridContainer);
-}
 
   function toggleSelect(num) {
     if (selectedNumbers.includes(num)) {
@@ -353,32 +348,30 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   async function playRandom(cantidad = 2) {
-  const ocupados = await obtenerNumerosOcupados();
-  const disponibles = [];
-  for (let i = 0; i < TOTAL_NUMBERS; i++) {
-    const num = String(i).padStart(4, '0');
-    if (!ocupados.has(num)) {
-      disponibles.push(num);
+    const ocupados = await obtenerNumerosOcupados();
+    const disponibles = [];
+    for (let i = 0; i < TOTAL_NUMBERS; i++) {
+      const num = String(i).padStart(4, '0');
+      if (!ocupados.has(num)) {
+        disponibles.push(num);
+      }
     }
+    if (disponibles.length < cantidad) {
+      alert('No hay suficientes números disponibles.');
+      return;
+    }
+    const seleccion = [];
+    const pool = [...disponibles];
+    for (let i = 0; i < cantidad; i++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      seleccion.push(pool[idx]);
+      pool.splice(idx, 1);
+    }
+    selectedNumbers = seleccion;
+    btnCambiar.style.display = 'inline-block';
+    renderGrid();
+    updateConfirmButton();
   }
-
-  if (disponibles.length < cantidad) {
-    alert('No hay suficientes números disponibles.');
-    return;
-  }
-
-  const seleccion = [];
-  const pool = [...disponibles];
-  for (let i = 0; i < cantidad; i++) {
-    const idx = Math.floor(Math.random() * pool.length);
-    seleccion.push(pool[idx]);
-    pool.splice(idx, 1);
-  }
-  selectedNumbers = seleccion;
-  btnCambiar.style.display = 'inline-block';
-  renderGrid();
-  updateConfirmButton();
-}
 
   function updateConfirmButton() {
     btnConfirmar.disabled = selectedNumbers.length < MIN_SELECTION;
