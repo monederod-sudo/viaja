@@ -44,12 +44,13 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+
 // === RUTA DE SALUD ===
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Backend conectado y funcionando.' });
 });
 
-// === OBTENER NÃšMEROS OCUPADOS ===
+// === OBTENER NÚMEROS OCUPADOS ===
 app.get('/api/ocupados', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -72,17 +73,17 @@ app.get('/api/ocupados', async (req, res) => {
 
     res.json({ numeros: [...ocupados] });
   } catch (err) {
-    console.error('âŒ Error al obtener nÃºmeros ocupados:', err.message || err);
-    res.status(500).json({ error: 'Error al obtener nÃºmeros ocupados.' });
+    console.error('? Error al obtener números ocupados:', err.message || err);
+    res.status(500).json({ error: 'Error al obtener números ocupados.' });
   }
 });
 
-// === REGISTRAR PARTICIPACIÃ“N ===
+// === REGISTRAR PARTICIPACIÓN ===
 app.post('/api/reservar', async (req, res) => {
   const { nombre, telefono, correo, numeros, referencia, fecha, timestamp } = req.body;
 
   if (!nombre || !telefono || !correo || !referencia || !fecha || !timestamp || !Array.isArray(numeros) || numeros.length < 2) {
-    return res.status(400).json({ error: 'Faltan datos o nÃºmeros insuficientes.' });
+    return res.status(400).json({ error: 'Faltan datos o números insuficientes.' });
   }
 
   try {
@@ -96,7 +97,7 @@ app.post('/api/reservar', async (req, res) => {
     const ocupados = new Set(todas.flatMap(p => p.numeros || []));
     const repetidos = numeros.filter(n => ocupados.has(n));
     if (repetidos.length > 0) {
-      return res.status(409).json({ error: `NÃºmeros ya usados: ${repetidos.join(', ')}` });
+      return res.status(409).json({ error: `Números ya usados: ${repetidos.join(', ')}` });
     }
 
     // Guardar en Supabase
@@ -118,27 +119,27 @@ app.post('/api/reservar', async (req, res) => {
 
     if (error) throw error;
 
-    // âœ‰ï¸ Enviar correo de recepciÃ³n
+    // ?? Enviar correo de recepción
     await transporter.sendMail({
       from: '"Gana y Viaja" <monederodh@gmail.com>',
       to: correo,
-      subject: 'ğŸ“„ Comprobante recibido - Pendiente de validaciÃ³n',
-      html: `<h2>ğŸ“„ Â¡Tu comprobante ha sido recibido!</h2>
+      subject: '?? Comprobante recibido - Pendiente de validación',
+      html: `<h2>?? ¡Tu comprobante ha sido recibido!</h2>
              <p>Hola <strong>${nombre}</strong>,</p>
-             <p>Hemos recibido tu comprobante de pago. Nuestro equipo lo estÃ¡ revisando.</p>
-             <p><strong>NÃºmeros jugados:</strong> ${numeros.map(n => `<span style="background:#e3f2fd; padding:4px 8px; border-radius:4px; margin:2px;">${n}</span>`).join(' ')}</p>
-             <p>Te notificaremos por correo cuando tu participaciÃ³n sea validada.</p>
-             <p>Gracias por participar en <strong>Gana y Viaja</strong> ğŸ‰</p>`
+             <p>Hemos recibido tu comprobante de pago. Nuestro equipo lo está revisando.</p>
+             <p><strong>Números jugados:</strong> ${numeros.map(n => `<span style="background:#e3f2fd; padding:4px 8px; border-radius:4px; margin:2px;">${n}</span>`).join(' ')}</p>
+             <p>Te notificaremos por correo cuando tu participación sea validada.</p>
+             <p>Gracias por participar en <strong>Gana y Viaja</strong> ??</p>`
     });
 
     res.status(201).json({ id: data[0].id });
   } catch (err) {
-    console.error('âŒ Error al registrar:', err.message || err);
-    res.status(500).json({ error: 'Error al registrar participaciÃ³n.' });
+    console.error('? Error al registrar:', err.message || err);
+    res.status(500).json({ error: 'Error al registrar participación.' });
   }
 });
 
-// === VALIDAR PARTICIPACIÃ“N ===
+// === VALIDAR PARTICIPACIÓN ===
 app.post('/api/participacion/:id/validar', async (req, res) => {
   const { id } = req.params;
 
@@ -150,11 +151,11 @@ app.post('/api/participacion/:id/validar', async (req, res) => {
       .single();
 
     if (fetchError || !participacion) {
-      return res.status(404).json({ error: 'ParticipaciÃ³n no encontrada.' });
+      return res.status(404).json({ error: 'Participación no encontrada.' });
     }
 
     if (participacion.estado === 'confirmado') {
-      return res.status(400).json({ error: 'Esta participaciÃ³n ya fue validada.' });
+      return res.status(400).json({ error: 'Esta participación ya fue validada.' });
     }
 
     const { error: updateError } = await supabase
@@ -164,27 +165,27 @@ app.post('/api/participacion/:id/validar', async (req, res) => {
 
     if (updateError) throw updateError;
 
-    // âœ‰ï¸ Enviar correo de validaciÃ³n
+    // ?? Enviar correo de validación
     await transporter.sendMail({
       from: '"Gana y Viaja" <monederodh@gmail.com>',
       to: participacion.correo,
-      subject: 'âœ… Â¡Tu participaciÃ³n ha sido validada!',
-      html: `<h2>âœ… Â¡Tu participaciÃ³n ha sido validada!</h2>
+      subject: '? ¡Tu participación ha sido validada!',
+      html: `<h2>? ¡Tu participación ha sido validada!</h2>
              <p>Hola <strong>${participacion.nombre}</strong>,</p>
-             <p>Tu pago ha sido verificado y tus nÃºmeros estÃ¡n confirmados:</p>
-             <p><strong>NÃºmeros:</strong> ${participacion.numeros.map(n => `<span style="background:#1976d2; color:white; padding:4px 8px; border-radius:4px; margin:2px;">${n}</span>`).join(' ')}</p>
-             <p>Â¡Mucha suerte en el sorteo!</p>
+             <p>Tu pago ha sido verificado y tus números están confirmados:</p>
+             <p><strong>Números:</strong> ${participacion.numeros.map(n => `<span style="background:#1976d2; color:white; padding:4px 8px; border-radius:4px; margin:2px;">${n}</span>`).join(' ')}</p>
+             <p>¡Mucha suerte en el sorteo!</p>
              <p>Equipo de <strong>Gana y Viaja</strong></p>`
     });
 
-    res.json({ success: true, message: 'ParticipaciÃ³n validada y correo enviado.' });
+    res.json({ success: true, message: 'Participación validada y correo enviado.' });
   } catch (err) {
-    console.error('âŒ Error al validar:', err);
-    res.status(500).json({ error: 'Error al validar la participaciÃ³n.' });
+    console.error('? Error al validar:', err);
+    res.status(500).json({ error: 'Error al validar la participación.' });
   }
 });
 
-// === RECHAZAR PARTICIPACIÃ“N ===
+// === RECHAZAR PARTICIPACIÓN ===
 app.post('/api/participacion/:id/rechazar', async (req, res) => {
   const { id } = req.params;
 
@@ -196,11 +197,11 @@ app.post('/api/participacion/:id/rechazar', async (req, res) => {
       .single();
 
     if (fetchError || !participacion) {
-      return res.status(404).json({ error: 'ParticipaciÃ³n no encontrada.' });
+      return res.status(404).json({ error: 'Participación no encontrada.' });
     }
 
     if (participacion.estado === 'confirmado') {
-      return res.status(400).json({ error: 'No se puede rechazar una participaciÃ³n ya validada.' });
+      return res.status(400).json({ error: 'No se puede rechazar una participación ya validada.' });
     }
 
     const { error: updateError } = await supabase
@@ -210,23 +211,33 @@ app.post('/api/participacion/:id/rechazar', async (req, res) => {
 
     if (updateError) throw updateError;
 
-    // âœ‰ï¸ Enviar correo de rechazo
+    // ?? Enviar correo de rechazo
     await transporter.sendMail({
       from: '"Gana y Viaja" <monederodh@gmail.com>',
       to: participacion.correo,
-      subject: 'âš ï¸ Tu participaciÃ³n no pudo ser validada',
-      html: `<h2>âš ï¸ Tu participaciÃ³n no pudo ser validada</h2>
+      subject: '?? Tu participación no pudo ser validada',
+      html: `<h2>?? Tu participación no pudo ser validada</h2>
              <p>Hola <strong>${participacion.nombre}</strong>,</p>
              <p>Lamentamos informarte que tu comprobante de pago no pudo ser verificado.</p>
-             <p>Si crees que es un error, por favor envÃ­a nuevamente el comprobante desde la pÃ¡gina web.</p>
-             <p>Gracias por tu interÃ©s.</p>
+             <p>Si crees que es un error, por favor envía nuevamente el comprobante desde la página web.</p>
+             <p>Gracias por tu interés.</p>
              <p>Equipo de <strong>Gana y Viaja</strong></p>`
     });
 
-    res.json({ success: true, message: 'ParticipaciÃ³n rechazada y correo enviado.' });
+    res.json({ success: true, message: 'Participación rechazada y correo enviado.' });
   } catch (err) {
-    console.error('âŒ Error al rechazar:', err);
-    res.status(500).json({ error: 'Error al rechazar la participaciÃ³n.' });
+    console.error('? Error al rechazar:', err);
+    res.status(500).json({ error: 'Error al rechazar la participación.' });
   }
 });
 
+// === RUTA RAÍZ PARA EVITAR "Cannot GET /" ===
+app.get('/', (req, res) => {
+  res.json({ message: 'API de Gana y Viaja activa ?' });
+});
+
+// === INICIAR SERVIDOR ===
+app.listen(PORT, () => {
+  console.log(`?? Backend corriendo en puerto ${PORT}`);
+  console.log(`?? Supabase URL: ${process.env.SUPABASE_URL}`);
+});
