@@ -20,14 +20,14 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 (async () => {
   try {
     const { data, error } = await supabase
-      .from('participaciones')
+      .from('participantes')
       .select('id')
       .limit(1);
     
     if (error) {
-      console.error('?? Error al acceder a la tabla "participaciones":', error);
+      console.error('?? Error al acceder a la tabla "participantes":', error);
     } else {
-      console.log('? Conexión a Supabase y tabla "participaciones" OK. Ejemplo de dato:', data);
+      console.log('? Conexión a Supabase y tabla "participantes" OK. Ejemplo de dato:', data);
     }
   } catch (err) {
     console.error('?? Error inesperado al probar Supabase:', err);
@@ -53,7 +53,7 @@ app.get('/api/health', (req, res) => {
 app.get('/api/ocupados', async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('participaciones')
+      .from('participantes')
       .select('numeros, estado, timestamp');
 
     if (error) throw error;
@@ -88,7 +88,7 @@ app.post('/api/reservar', async (req, res) => {
   try {
     // Verificar duplicados en tiempo real
     const { data: todas, error: errCheck } = await supabase
-      .from('participaciones')
+      .from('participantes')
       .select('numeros');
 
     if (errCheck) throw errCheck;
@@ -101,7 +101,7 @@ app.post('/api/reservar', async (req, res) => {
 
     // Guardar en Supabase
     const { data, error } = await supabase
-      .from('participaciones')
+      .from('participantes')
       .insert([
         {
           nombre,
@@ -144,7 +144,7 @@ app.post('/api/participacion/:id/validar', async (req, res) => {
 
   try {
     const { data: participacion, error: fetchError } = await supabase
-      .from('participaciones')
+      .from('participantes')
       .select('*')
       .eq('id', id)
       .single();
@@ -158,7 +158,7 @@ app.post('/api/participacion/:id/validar', async (req, res) => {
     }
 
     const { error: updateError } = await supabase
-      .from('participaciones')
+      .from('participantes')
       .update({ estado: 'confirmado' })
       .eq('id', id);
 
@@ -190,7 +190,7 @@ app.post('/api/participacion/:id/rechazar', async (req, res) => {
 
   try {
     const { data: participacion, error: fetchError } = await supabase
-      .from('participaciones')
+      .from('participantes')
       .select('*')
       .eq('id', id)
       .single();
@@ -204,7 +204,7 @@ app.post('/api/participacion/:id/rechazar', async (req, res) => {
     }
 
     const { error: updateError } = await supabase
-      .from('participaciones')
+      .from('participantes')
       .update({ estado: 'rechazado' })
       .eq('id', id);
 
