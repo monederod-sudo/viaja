@@ -535,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/reservar`, {
+      const response = await fetch(`${API_URL}/api/pendiente`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
