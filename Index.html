@@ -401,13 +401,13 @@ document.addEventListener('DOMContentLoaded', function () {
     await renderGrid();
   };
   jugarAzarBtn.onclick = async () => {
-    const opcion = confirm("¿Jugar con 2 números?\nAceptar = 2 números\nCancelar = elegir entre 4 y 10");
+    const opcion = confirm("¿Jugar con 2 números?\nAceptar = 2 números\nCancelar = elegir entre 3 y 10");
     if (opcion) {
       await playRandom(2);
     } else {
-      let cantidad = prompt("¿Cuántos números? (4 a 10)", "");
+      let cantidad = prompt("¿Cuántos números? (3 a 10)", "5");
       cantidad = parseInt(cantidad);
-      if (isNaN(cantidad) || cantidad < 4 || cantidad > 10) cantidad = 4;
+      if (isNaN(cantidad) || cantidad < 3 || cantidad > 10) cantidad = 4;
       await playRandom(cantidad);
     }
   };
@@ -562,7 +562,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // === MENSAJE FINAL CON BOTÓN FUNCIONAL ===
   function mostrarMensajeFuegosArtificiales(selectedNumbers) {
-  if (!numerosSeleccionados || numerosSeleccionados.length === 0) {
+  if (!selectedNumbers || selectedNumbers.length === 0) {
     alert("Error: no hay números seleccionados.");
     return;
   }
@@ -688,5 +688,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 </body>
-
 </html>
