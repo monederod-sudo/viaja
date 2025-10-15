@@ -51,7 +51,15 @@ app.get('/api/health', (req, res) => {
 });
 
 
-
+// === OBTENER PARTICIPANTES ===
+app.get('/api/participantes', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT * FROM participantes');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al consultar la base de datos' });
+  }
+});
 
 // === OBTENER N�MEROS OCUPADOS ===
 app.get('/api/ocupados', async (req, res) => {
@@ -83,6 +91,7 @@ app.get('/api/ocupados', async (req, res) => {
 
 // === REGISTRAR PARTICIPACI�N ===
 app.post('/api/reservar', async (req, res) => {
+  console.log('req.body:', req.body);
   const { nombre, telefono, correo, numeros, referencia, fecha, timestamp } = req.body;
 
   if (!nombre || !telefono || !correo || !referencia || !fecha || !timestamp || !Array.isArray(numeros) || numeros.length < 2) {
