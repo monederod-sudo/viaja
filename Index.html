@@ -330,8 +330,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const num = String(i).padStart(4, '0');
     if (!ocupados.has(num)) { // 👈 Solo si NO está ocupado
       const cell = document.createElement('div');
-      cell.className = 'numero-celda';
-      cell.textContent = num;
+            cell.className = 'numero-celda';
+            cell.textContent = num;
+            cell.dataset.num = num; // ✅ Añade el atributo
       if (selectedNumbers.includes(num)) {
         cell.classList.add('seleccionado');
       }
@@ -549,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       const data = await response.json();
       if (response.ok) {
-        mostrarMensajeFuegosArtificiales();
+        mostrarMensajeFuegosArtificiales(selectedNumbers);
       } else {
         alert('❌ ' + (data.error || 'Error al registrar participación.'));
       }
@@ -560,81 +561,81 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   // === MENSAJE FINAL CON BOTÓN FUNCIONAL ===
-  function mostrarMensajeFuegosArtificiales() {
-    if (!selectedNumbers || selectedNumbers.length === 0) {
-      alert("Error: no hay números seleccionados.");
-      return;
-    }
-
-    const mensaje = document.createElement('div');
-    mensaje.id = 'mensajeFuegos';
-    mensaje.style.position = 'fixed';
-    mensaje.style.top = '0';
-    mensaje.style.left = '0';
-    mensaje.style.width = '100%';
-    mensaje.style.height = '100%';
-    mensaje.style.background = 'rgba(0,0,0,0.8)';
-    mensaje.style.display = 'flex';
-    mensaje.style.justifyContent = 'center';
-    mensaje.style.alignItems = 'center';
-    mensaje.style.zIndex = '1001';
-
-    const content = document.createElement('div');
-    content.style.background = 'white';
-    content.style.padding = '30px';
-    content.style.borderRadius = '12px';
-    content.style.textAlign = 'center';
-    content.style.color = '#333';
-    content.style.maxWidth = '90%';
-    content.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
-
-    content.innerHTML = `
-      <h2 style="color:#1976d2; margin:0 0 10px; font-size:24px;">🎉 ¡Estás participando! 🎉</h2>
-      <p style="margin:5px 0; font-size:16px;">¡Fin de semana de desconexión te espera!</p>
-      <p style="font-size:18px; font-weight:bold; margin:15px 0 5px;">Números con los que participas:</p>
-      <p style="font-size:22px; color:#1976d2; font-weight:bold; margin:5px 0 15px;">
-        ${selectedNumbers.map(num => `<span style="display:inline-block; background:#1976d2; color:white; padding:6px 12px; margin:0 5px; border-radius:6px; font-weight:bold;">${num}</span>`).join('')}
-      </p>
-      <p style="margin:0; font-size:14px; color:#666;">Gracias por tu participación.</p>
-    `;
-
-    const btnCerrar = document.createElement('button');
-    btnCerrar.textContent = 'Cerrar y volver al inicio';
-    btnCerrar.style.marginTop = '20px';
-    btnCerrar.style.padding = '10px 20px';
-    btnCerrar.style.background = '#e53935';
-    btnCerrar.style.color = 'white';
-    btnCerrar.style.border = 'none';
-    btnCerrar.style.borderRadius = '4px';
-    btnCerrar.style.cursor = 'pointer';
-    btnCerrar.style.fontSize = '16px';
-
-    btnCerrar.addEventListener('click', function() {
-      // Marcar los números seleccionados como "ocupados" en el DOM
-      selectedNumbers.forEach(num => {
-        const cell = document.querySelector(`.numero-celda[data-num="${num}"]`);
-        if (cell) {
-          cell.classList.add('ocupado');
-          cell.style.backgroundColor = '#ddd';
-          cell.style.cursor = 'not-allowed';
-          cell.onclick = null;
-        }
-      });
-
-      mensaje.remove();
-      moduloPagoCompleto.style.display = 'none';
-      carruselContainer.style.display = 'block';
-      btnIniciar.style.display = 'block';
-      resetSelection();
-      delete window.telefonoValidado;
-    });
-
-    content.appendChild(btnCerrar);
-    mensaje.appendChild(content);
-    document.body.appendChild(mensaje);
-    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+  function mostrarMensajeFuegosArtificiales(selectedNumbers) {
+  if (!numerosSeleccionados || numerosSeleccionados.length === 0) {
+    alert("Error: no hay números seleccionados.");
+    return;
   }
 
+  const mensaje = document.createElement('div');
+  mensaje.id = 'mensajeFuegos';
+  mensaje.style.position = 'fixed';
+  mensaje.style.top = '0';
+  mensaje.style.left = '0';
+  mensaje.style.width = '100%';
+  mensaje.style.height = '100%';
+  mensaje.style.background = 'rgba(0,0,0,0.8)';
+  mensaje.style.display = 'flex';
+  mensaje.style.justifyContent = 'center';
+  mensaje.style.alignItems = 'center';
+  mensaje.style.zIndex = '1001';
+
+  const content = document.createElement('div');
+  content.style.background = 'white';
+  content.style.padding = '30px';
+  content.style.borderRadius = '12px';
+  content.style.textAlign = 'center';
+  content.style.color = '#333';
+  content.style.maxWidth = '90%';
+  content.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+
+  content.innerHTML = `
+    <h2 style="color:#1976d2; margin:0 0 10px; font-size:24px;">🎉 ¡Estás participando! 🎉</h2>
+    <p style="margin:5px 0; font-size:16px;">¡Fin de semana de desconexión te espera!</p>
+    <p style="font-size:18px; font-weight:bold; margin:15px 0 5px;">Números con los que participas:</p>
+    <p style="font-size:22px; color:#1976d2; font-weight:bold; margin:5px 0 15px;">
+      ${numerosSeleccionados.map(num => `<span style="display:inline-block; background:#1976d2; color:white; padding:6px 12px; margin:0 5px; border-radius:6px; font-weight:bold;">${num}</span>`).join('')}
+    </p>
+    <p style="margin:0; font-size:14px; color:#666;">Gracias por tu participación.</p>
+  `;
+
+  const btnCerrar = document.createElement('button');
+  btnCerrar.textContent = 'Cerrar y volver al inicio';
+  btnCerrar.style.marginTop = '20px';
+  btnCerrar.style.padding = '10px 20px';
+  btnCerrar.style.background = '#e53935';
+  btnCerrar.style.color = 'white';
+  btnCerrar.style.border = 'none';
+  btnCerrar.style.borderRadius = '4px';
+  btnCerrar.style.cursor = 'pointer';
+  btnCerrar.style.fontSize = '16px';
+
+  btnCerrar.addEventListener('click', function() {
+    // Marcar visualmente como ocupados
+    numerosSeleccionados.forEach(num => {
+      const cell = document.querySelector(`.numero-celda[data-num="${num}"]`);
+      if (cell && cell.textContent.trim() === num) {
+        cell.classList.add('ocupado');
+        cell.style.backgroundColor = '#ddd';
+        cell.style.color = '#666';
+        cell.style.cursor = 'not-allowed';
+        cell.onclick = null;
+      }
+    });
+
+    mensaje.remove();
+    moduloPagoCompleto.style.display = 'none';
+    carruselContainer.style.display = 'block';
+    btnIniciar.style.display = 'block';
+    resetSelection();
+    delete window.telefonoValidado;
+  });
+
+  content.appendChild(btnCerrar);
+  mensaje.appendChild(content);
+  document.body.appendChild(mensaje);
+  confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+}
   // === ADMIN ===
   let adminClickCount = 0;
   let adminResetTimer = null;

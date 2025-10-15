@@ -194,6 +194,9 @@ async function obtenerParticipacionesDesdeSupabase() {
   const SUPABASE_URL = 'https://sbpsiaeeuvbzezsvdwst.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNicHNpYWVldXZiemV6c3Zkd3N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0MzY1NDEsImV4cCI6MjA3NjAxMjU0MX0.2WK4eDppQPe5KdcQgSS9oQRpvUH_9C_UzU8jJIEgnow';
   
+
+// === OBTENER PARTICIPACIONES ===
+async function obtenerParticipacionesDesdeSupabase() {
   try {
     const response = await fetch(`${SUPABASE_URL}/rest/v1/participantes?select=*`, {
       headers: {
@@ -201,97 +204,75 @@ async function obtenerParticipacionesDesdeSupabase() {
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
       }
     });
-
     if (response.ok) {
       return await response.json();
     } else {
-      console.error('Error al obtener participaciones:', await response.json());
+      console.error('Error Supabase:', await response.json());
       return [];
     }
   } catch (error) {
-    console.error('Error de red:', error);
+    console.error('Error red:', error);
     return [];
   }
 }
 
-// === FUNCIONES ACTUALIZADAS PARA USAR EL BACKEND ===
-
+// === VALIDAR / RECHAZAR ===
 async function validarParticipacion(id) {
-  if (!confirm('¿Estás seguro de que deseas VALIDAR esta participación?')) return;
-
+  if (!confirm('¿Validar esta participación?')) return;
   try {
-    const response = await fetch(`${API_BASE}/api/participacion/${id}/validar`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    const response = await fetch(`${API_BASE}/api/participacion/${id}/validar`, { method: 'POST' });
     const data = await response.json();
-
     if (response.ok) {
       alert(`✅ ${data.message}`);
-      const participaciones = await obtenerParticipacionesDesdeSupabase();
-      renderizarTabla(participantes);
+      const participaciones = await obtenerParticipacionesDesdeSupabase(); // ✅ Nombre correcto
+      renderizarTabla(participaciones);
     } else {
-      alert(`❌ Error: ${data.error}`);
+      alert(`❌ ${data.error}`);
     }
   } catch (error) {
-    console.error('Error al validar:', error);
-    alert('❌ Error de conexión con el servidor.');
+    alert('❌ Error de conexión.');
   }
 }
 
 async function rechazarParticipacion(id) {
-  if (!confirm('¿Estás seguro de que deseas RECHAZAR esta participación?')) return;
-
+  if (!confirm('¿Rechazar esta participación?')) return;
   try {
-    const response = await fetch(`${API_BASE}/api/participacion/${id}/rechazar`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    const response = await fetch(`${API_BASE}/api/participacion/${id}/rechazar`, { method: 'POST' });
     const data = await response.json();
-
     if (response.ok) {
       alert(`✅ ${data.message}`);
-      const participaciones = await obtenerParticipacionesDesdeSupabase();
-      renderizarTabla(participantes);
+      const participaciones = await obtenerParticipacionesDesdeSupabase(); // ✅ Nombre correcto
+      renderizarTabla(participaciones);
     } else {
-      alert(`❌ Error: ${data.error}`);
+      alert(`❌ ${data.error}`);
     }
   } catch (error) {
-    console.error('Error al rechazar:', error);
-    alert('❌ Error de conexión con el servidor.');
+    alert('❌ Error de conexión.');
   }
 }
 
 // === RENDERIZAR TABLA ===
-function renderizarTabla(participantes) {
-  const tbody = document.querySelector('#participantesTable tbody');
+function renderizarTabla(participaciones) {
+  const tbody = document.querySelector('#participacionesTable tbody'); // ✅ ID correcto
   tbody.innerHTML = '';
-
   if (participaciones.length === 0) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No hay participaciones.</td></tr>`;
     return;
   }
-
   participaciones.forEach(p => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${p.nombre || ''}</td>
       <td>${p.telefono || ''}</td>
       <td>${p.correo || ''}</td>
-      <td>${Array.isArray(p.numeros) ? p.numeros.join(', ') : p.numeros || ''}</td>
+      <td>${Array.isArray(p.numeros) ? p.numeros.join(', ') : ''}</td>
       <td>${p.fecha ? new Date(p.fecha).toLocaleString() : ''}</td>
       <td><span class="estado-${p.estado}">${p.estado?.charAt(0).toUpperCase() + p.estado?.slice(1) || 'Desconocido'}</span></td>
       <td>
-        ${
-          p.estado === 'pendiente'
-            ? `
-              <button class="btn-validar" onclick="validarParticipacion(${p.id})">Validar</button>
-              <button class="btn-rechazar" onclick="rechazarParticipacion(${p.id})">Rechazar</button>
-            `
-            : `<span class="estado-${p.estado}">${p.estado?.charAt(0).toUpperCase() + p.estado?.slice(1) || 'Desconocido'}</span>`
-        }
+        ${p.estado === 'pendiente' ? `
+          <button class="btn-validar" onclick="validarParticipacion(${p.id})">Validar</button>
+          <button class="btn-rechazar" onclick="rechazarParticipacion(${p.id})">Rechazar</button>
+        ` : `<span class="estado-${p.estado}">${p.estado?.charAt(0).toUpperCase() + p.estado?.slice(1)}</span>`}
       </td>
     `;
     tbody.appendChild(tr);
@@ -301,18 +282,18 @@ function renderizarTabla(participantes) {
 // === BÚSQUEDA Y GANADOR ===
 async function buscarParticipacion() {
   const term = document.getElementById('searchInput').value.toLowerCase();
-  const todas = await obtenerparticipantesDesdeSupabase();
+  const todas = await obtenerParticipacionesDesdeSupabase(); // ✅
   const filtradas = todas.filter(p =>
     (p.nombre?.toLowerCase().includes(term)) ||
     (p.telefono?.includes(term)) ||
     (p.correo?.toLowerCase().includes(term)) ||
-    (Array.isArray(p.numeros) ? p.numeros.some(n => n.includes(term)) : (p.numeros?.includes(term)))
+    (Array.isArray(p.numeros) ? p.numeros.some(n => n.includes(term)) : false)
   );
   renderizarTabla(filtradas);
 }
 
 async function encontrarGanador() {
-  const todas = await obtenerparticipantesDesdeSupabase();
+  const todas = await obtenerParticipacionesDesdeSupabase(); // ✅
   const confirmadas = todas.filter(p => p.estado === 'confirmado');
   if (confirmadas.length === 0) {
     alert('No hay participaciones confirmadas.');
@@ -322,12 +303,10 @@ async function encontrarGanador() {
   const num = Array.isArray(ganador.numeros) 
     ? ganador.numeros[Math.floor(Math.random() * ganador.numeros.length)] 
     : ganador.numeros;
-  
   document.getElementById('ganadorNombre').textContent = ganador.nombre || 'Desconocido';
   document.getElementById('ganadorNumero').textContent = num || 'N/A';
   document.getElementById('ganadorSorteo').textContent = '47';
   document.getElementById('ganadorPopup').style.display = 'flex';
-  
   setTimeout(() => {
     document.getElementById('emailStatus').textContent = '✅ Correo enviado al ganador.';
   }, 1000);
@@ -350,8 +329,8 @@ document.getElementById('ganadorPopup').addEventListener('click', function(e) {
 
 // === INICIALIZAR ===
 window.addEventListener('load', async () => {
-  const participaciones = await obtenerParticipacionesDesdeSupabase();
-  renderizarTabla(participantes);
+  const participaciones = await obtenerParticipacionesDesdeSupabase(); // ✅
+  renderizarTabla(participaciones);
 });
 </script>
 
