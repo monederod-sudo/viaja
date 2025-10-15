@@ -50,6 +50,9 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Backend conectado y funcionando.' });
 });
 
+
+
+
 // === OBTENER N�MEROS OCUPADOS ===
 app.get('/api/ocupados', async (req, res) => {
   try {
